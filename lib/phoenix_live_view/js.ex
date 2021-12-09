@@ -149,7 +149,14 @@ defmodule Phoenix.LiveView.JS do
 
       <button phx-click={JS.dispatch("click", to: ".nav")}>Click me!</button>
   """
-  def dispatch(cmd \\ %JS{}, event, opts) do
+  def dispatch(event) when is_binary(event), do: dispatch(%JS{}, event, [])
+
+  def dispatch(event, opts) when is_binary(event) and is_list(opts),
+    do: dispatch(%JS{}, event, opts)
+
+  def dispatch(%JS{} = cmd, event) when is_binary(event), do: dispatch(cmd, event, [])
+
+  def dispatch(%JS{} = cmd, event, opts) when is_binary(event) and is_list(opts) do
     opts = validate_keys(opts, :dispatch, [:to, :detail])
     args = %{event: event, to: opts[:to]}
 
