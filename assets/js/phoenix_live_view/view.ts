@@ -1175,9 +1175,11 @@ export default class View {
       this.channel.leave();
     }
     if (resp.redirect) {
+      this.liveSocket.dispatchEvents(resp.redirect.events || []);
       return this.onRedirect(resp.redirect);
     }
     if (resp.live_redirect) {
+      this.liveSocket.dispatchEvents(resp.live_redirect.events || []);
       return this.onLiveRedirect(resp.live_redirect);
     }
     this.log("error", () => ["unable to join", resp]);

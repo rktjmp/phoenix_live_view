@@ -190,6 +190,56 @@ defmodule Phoenix.LiveViewTest.Support.EventsInComponentLive do
       """
     end
 
+    defmodule Phoenix.LiveViewTest.Support.EventsRedirectOnMountLive do
+      use Phoenix.LiveView, namespace: Phoenix.LiveViewTest
+
+      def render(assigns) do
+        ~H"redirecting"
+      end
+
+      def mount(_params, _session, socket) do
+        if connected?(socket) do
+          {:ok,
+           socket
+           |> push_event("mount-redirect-event", %{from: "mount"})
+           |> push_navigate(to: "/events-redirect-target")}
+        else
+          {:ok, socket}
+        end
+      end
+    end
+
+    defmodule Phoenix.LiveViewTest.Support.EventsRedirectOnHandleParamsLive do
+      use Phoenix.LiveView, namespace: Phoenix.LiveViewTest
+
+      def render(assigns) do
+        ~H"redirecting"
+      end
+
+      def mount(_params, _session, socket), do: {:ok, socket}
+
+      def handle_params(_params, _uri, socket) do
+        if connected?(socket) do
+          {:noreply,
+           socket
+           |> push_event("params-redirect-event", %{from: "handle_params"})
+           |> push_navigate(to: "/events-redirect-target")}
+        else
+          {:noreply, socket}
+        end
+      end
+    end
+
+    defmodule Phoenix.LiveViewTest.Support.EventsRedirectTargetLive do
+      use Phoenix.LiveView, namespace: Phoenix.LiveViewTest
+
+      def render(assigns) do
+        ~H"landed"
+      end
+
+      def mount(_params, _session, socket), do: {:ok, socket}
+    end
+
     def update(assigns, socket) do
       socket =
         if connected?(socket),

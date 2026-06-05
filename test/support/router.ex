@@ -111,6 +111,9 @@ defmodule Phoenix.LiveViewTest.Support.Router do
     live "/events-in-component", EventsInComponentLive
     live "/events-multi-js", EventsMultiJSLive
     live "/events-multi-js-in-component", EventsInComponentMultiJSLive
+    live "/events-redirect-on-mount", EventsRedirectOnMountLive
+    live "/events-redirect-on-handle-params", EventsRedirectOnHandleParamsLive
+    live "/events-redirect-target", EventsRedirectTargetLive
 
     # integration components
     live "/component_in_live", ComponentInLive.Root

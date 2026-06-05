@@ -1266,6 +1266,30 @@ describe("View", function () {
     // still need a few tests
   });
 
+  test("onJoinError dispatches events for live_redirect", () => {
+    liveSocket = new LiveSocket("/live", Socket);
+    const el = liveViewDOM();
+    const view = new View(el, liveSocket, null, null, null);
+    stubChannel(view);
+
+    const dispatchEvents = jest.spyOn(view.liveSocket, "dispatchEvents");
+    const onLiveRedirect = jest
+      .spyOn(view, "onLiveRedirect")
+      .mockImplementation(() => undefined);
+
+    const events = [["my-event", { from: "mount" }]];
+
+    view.onJoinError({
+      live_redirect: { to: "/events-redirect-target", events },
+    });
+
+    expect(dispatchEvents).toHaveBeenCalledWith(events);
+    expect(onLiveRedirect).toHaveBeenCalledWith({
+      to: "/events-redirect-target",
+      events,
+    });
+  });
+
   test("sends _track_static and _mounts on params", () => {
     liveSocket = new LiveSocket("/live", Socket);
     const el = liveViewDOM();

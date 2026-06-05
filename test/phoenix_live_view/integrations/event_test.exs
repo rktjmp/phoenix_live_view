@@ -57,6 +57,24 @@ defmodule Phoenix.LiveView.EventTest do
       assert_redirect(view, "/events")
     end
 
+    test "includes events with live redirects from connected mount", %{conn: conn} do
+      assert {:error,
+              {:live_redirect,
+               %{
+                 to: "/events-redirect-target",
+                 events: [["mount-redirect-event", %{from: "mount"}]]
+               }}} = live(conn, "/events-redirect-on-mount")
+    end
+
+    test "includes events with live redirects from first handle_params call", %{conn: conn} do
+      assert {:error,
+              {:live_redirect,
+               %{
+                 to: "/events-redirect-target",
+                 events: [["params-redirect-event", %{from: "handle_params"}]]
+               }}} = live(conn, "/events-redirect-on-handle-params")
+    end
+
     test "sends updates with no assigns diff", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/events")
 

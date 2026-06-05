@@ -600,13 +600,19 @@ defmodule Phoenix.LiveView.Channel do
         {:ok, diff, redir, new_state}
 
       {:redirect, %{to: _to} = opts} ->
-        {:redirect, copy_flash(new_state, Utils.get_flash(new_socket), opts), new_state}
+        {:redirect,
+         copy_flash(new_state, Utils.get_flash(new_socket), opts)
+         |> maybe_put_push_events(new_socket), new_state}
 
       {:redirect, %{external: url}} ->
-        {:redirect, copy_flash(new_state, Utils.get_flash(new_socket), %{to: url}), new_state}
+        {:redirect,
+         copy_flash(new_state, Utils.get_flash(new_socket), %{to: url})
+         |> maybe_put_push_events(new_socket), new_state}
 
       {:live, :redirect, %{to: _to} = opts} ->
-        {:live_redirect, copy_flash(new_state, Utils.get_flash(new_socket), opts), new_state}
+        {:live_redirect,
+         copy_flash(new_state, Utils.get_flash(new_socket), opts)
+         |> maybe_put_push_events(new_socket), new_state}
 
       {:live, :patch, %{to: to} = opts} ->
         {params, action} = patch_params_and_action!(new_socket, opts)
@@ -999,6 +1005,13 @@ defmodule Phoenix.LiveView.Channel do
 
   defp copy_flash(state, flash, opts),
     do: Map.put(opts, :flash, Utils.sign_flash(state.socket.endpoint, flash))
+
+  defp maybe_put_push_events(opts, socket) do
+    case Diff.get_push_events_diff(socket) do
+      %{e: events} -> Map.put(opts, :events, events)
+      _ -> opts
+    end
+  end
 
   defp maybe_diff(%{socket: socket} = state, force?) do
     socket.redirected || render_diff(state, socket, force?)
